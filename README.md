@@ -40,3 +40,14 @@ You can make API calls through the proxy by replacing `https://sandbox.bluebutto
 http://localhost:3000/v1/fhir/Patient/-20140000001827
 ```
 Note you need to add a negative sign to the user ID in the CSV file.
+
+### Authenticate and redirect
+You can use the proxy to authenticate and redirect to an internal application server to further API calls
+```
+http://localhost:3000/api
+```
+It will ask you to authenticate and redirect to 
+```
+http://localhost:8080/bluebutton?token=<token>
+```
+You need to start the other server before the redirect.
