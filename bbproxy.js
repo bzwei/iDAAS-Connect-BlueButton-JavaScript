@@ -32,18 +32,34 @@ http.createServer(function (req, res) {
 
   if (route == '/login') {
     const query = querystring.parse(parts.query);
+    if (query['uid'] == undefined) {
+      res.statusCode = 400;
+      res.write("Missing uid in query parameter");
+      res.end();
+      return;
+    }
+
     const authorizationUri = getOAuthClient(query['uid']).code.getUri();
 
     res.writeHead(301, { "Location": authorizationUri});
     res.end();
+  }
+  else if(route == '/api') {
+    res.writeHead(301, { "Location": getOAuthClient(null).code.getUri()});
+    res.end();   
   }
   else if(route == '/callback') {
     const query = querystring.parse(parts.query);
     getOAuthClient(query['state']).code.getToken(req.url)
       .then(function(user) {
         console.log(user);
-        tokens[user.client.options['state']] = user.accessToken;
-        res.write('Login succeeded!')
+        if(user.client.options['state'] == undefined) {
+          res.writeHead(301, { "Location": "http://localhost:8080/bluebutton?token=" + user.accessToken});          
+        }
+        else {
+          tokens[user.client.options['state']] = user.accessToken;
+          res.write('Login succeeded!')
+        }
         res.end();
       });
   }
